@@ -1,0 +1,5 @@
+#!/bin/bash
+
+G_IP=$(/sbin/ip -4 route list 0/0 | cut -d ' ' -f 3)
+echo "$G_IP"
+exit 0

@@ -1,0 +1,89 @@
+#!/bin/sh -e
+#
+# rc.local
+#
+# This script is executed at the end of each multiuser runlevel.
+# Make sure that the script will "exit 0" on success or any other
+# value on error.
+#
+# In order to enable or disable this script just change the execution
+# bits.
+#
+# By default this script does nothing.
+
+sync & sync & sync
+
+# Check whether we running on an RB25F or a Pine Board
+board=$(cat /etc/armbian-image-release | grep "BOARD=")
+
+# Set the system time from RTC - this is complicated because any non-zero exit code will terminate rc.local
+if /usr/bin/test $board == 'BOARD=rb25f'; then
+    rtc_time="$(/sbin/hwclock -r 2>&1 | grep " ")"
+    if [ -z "${rtc_time##*failed*}" ]; then
+        echo "RTC registers have corrupt data - RTC will be synced to system time"
+        /sbin/hwclock -w || /bin/true
+    else
+        echo "System time synced to RTC time"
+        /sbin/hwclock -s || /bin/true
+    fi
+fi
+
+
+# RB25F Customisations
+if ! /usr/bin/test -f /root/.first_ran; then
+
+    if /usr/bin/test $board == 'BOARD=rb25f'; then
+	    tune2fs -o journal_data /dev/mmcblk1p1
+	    tune2fs -e panic /dev/mmcblk1p1
+	    tune2fs -c 1 /dev/mmcblk1p1
+	else
+	    tune2fs -o journal_data /dev/mmcblk0p1
+	    tune2fs -e panic /dev/mmcblk0p1
+	    tune2fs -c 1 /dev/mmcblk0p1
+	fi
+
+	echo "Shut-off ntp to enable manual time-sync"
+	/bin/sleep 10
+	/bin/systemctl disable ntp
+	/bin/systemctl stop ntp
+	/usr/sbin/ntpdate -b pool.ntp.org
+	hwclock -w
+	depmod
+	ldconfig
+	
+	cd /root/tmpfiles
+	dpkg -i *.deb
+	sleep 1
+
+	cd /root/tmpfiles/mosquitto
+	dpkg -i *.deb	
+	sync
+	sleep 2
+	cp /etc/mosquitto/mosquitto.orig /etc/mosquitto/mosquitto.conf
+	
+	/usr/bin/touch /root/.first_ran
+	sync
+	sleep 1
+fi
+
+if /usr/bin/test -f /root/.upgraded; then
+	echo "Finishing off upgrade"
+	depmod
+	ldconfig
+	rm -f /root/.upgraded
+	sync
+fi
+
+# Force Mosquitto log folder ownership
+mkdir -p /var/log/mosquitto /var/log.hdd/mosquitto
+touch /var/log/mosquitto/mosquitto.log /var/log.hdd/mosquitto/mosquitto.log
+chown -R mosquitto:mosquitto /var/log/mosquitto /var/log.hdd/mosquitto
+systemctl stop mosquitto; sleep 1; systemctl start mosquitto
+
+# Set the hostname to include the MAC Address
+/usr/local/bin/set_hostname.sh
+
+mkdir /dev/output
+ln -s /sys/class/leds/relay/brightness /dev/output/relay 
+
+exit 0

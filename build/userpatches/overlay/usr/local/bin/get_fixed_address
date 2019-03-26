@@ -1,0 +1,7 @@
+#!/bin/bash
+
+FA="$(/usr/local/bin/get_mac)"
+FA="${FA//:/}"
+FA="${FA:4}"
+echo "$FA"
+exit 0

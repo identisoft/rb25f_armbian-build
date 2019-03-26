@@ -1,0 +1,8 @@
+#!/bin/bash
+
+MAC="$(/sbin/ip  addr 2>/dev/null | grep -m 1 "link/ether")"
+MAC="$(echo -e "${MAC}" | sed -e 's/^[[:space:]]*//')"
+MAC="$(echo "${MAC}" | cut -d ' ' -f 2 | cut -d '/' -f 1)"
+MAC="${MAC^^}"
+echo "$MAC"
+exit 0

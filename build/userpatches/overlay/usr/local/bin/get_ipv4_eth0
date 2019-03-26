@@ -1,0 +1,7 @@
+#!/bin/bash
+
+IP="$(/sbin/ip  addr | grep eth0 | grep "global")"
+IP="$(echo -e "${IP}" | sed -e 's/^[[:space:]]*//')"
+IP="$(echo "${IP}" | cut -d ' ' -f 2 | cut -d '/' -f 1)"
+echo "$IP"
+exit 0
