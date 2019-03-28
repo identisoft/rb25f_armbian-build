@@ -162,7 +162,7 @@ VER="${VER/-$LINUXFAMILY/}"
 # build additional packages
 [[ $EXTERNAL_NEW == compile ]] && chroot_build_packages
 
-#debootstrap_ng
+debootstrap_ng
 
 # hook for function to run after build, i.e. to change owner of $SRC
 # NOTE: this will run only if there were no errors during build process
