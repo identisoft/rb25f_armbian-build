@@ -891,7 +891,7 @@ fetch_gitlab_repo()
 
 get_product_issue()
 {
-  product_issue="1.5.0.78"
+  product_issue="1.5.0.79"
 }
 
 
