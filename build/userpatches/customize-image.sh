@@ -47,6 +47,7 @@ Main() {
 	rm /etc/resolvconf/resolv.conf.d/head
 	touch /etc/resolv.conf
 	touch /etc/resolvconf/resolv.conf.d/head
+	cd /
 } # Main
 
 Main "$@"

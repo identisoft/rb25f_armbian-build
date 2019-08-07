@@ -31,15 +31,24 @@ fi
 
 # RB25F Customisations
 if ! /usr/bin/test -f /root/.first_ran; then
-
-    if /usr/bin/test $board == 'BOARD=rb25f'; then
-	    tune2fs -o journal_data /dev/mmcblk1p1
-	    tune2fs -e panic /dev/mmcblk1p1
-	    tune2fs -c 1 /dev/mmcblk1p1
+	MAC_PREFIX=$(/usr/local/bin/get_mac | awk '{print substr($1,0,9)}')
+  if /usr/bin/test $board == 'BOARD=rb25f'; then
+	  tune2fs -o journal_data /dev/mmcblk1p1
+	  tune2fs -e panic /dev/mmcblk1p1
+	  tune2fs -c 1 /dev/mmcblk1p1
 	else
-	    tune2fs -o journal_data /dev/mmcblk0p1
-	    tune2fs -e panic /dev/mmcblk0p1
-	    tune2fs -c 1 /dev/mmcblk0p1
+	  tune2fs -o journal_data /dev/mmcblk0p1
+	  tune2fs -e panic /dev/mmcblk0p1
+	  tune2fs -c 1 /dev/mmcblk0p1
+	fi
+	if /usr/bin/test $MAC_PREFIX == '00:1A:6E'; then
+		sed 's/HID iClass SE RB25F/Impro HRB910/' /etc/update-motd.d/10-armbian-header > /etc/update-motd.d/temp && rm /etc/update-motd.d/10-armbian-header && mv /etc/update-motd.d/temp /etc/update-motd.d/10-armbian-header
+		sed 's/HID iClass SE/Impro/' /etc/update-motd.d/10-armbian-header > /etc/update-motd.d/temp && rm /etc/update-motd.d/10-armbian-header && mv /etc/update-motd.d/temp /etc/update-motd.d/10-armbian-header
+		sed 's/RB25F/HRB910/' /etc/update-motd.d/10-armbian-header > /etc/update-motd.d/temp && rm /etc/update-motd.d/10-armbian-header && mv /etc/update-motd.d/temp /etc/update-motd.d/10-armbian-header
+		chmod +x /etc/update-motd.d/10-armbian-header 
+		
+		sed 's/IMAGE_TYPE=HID/IMAGE_TYPE=Impro/' /etc/armbian-release > /etc/temp && rm /etc/armbian-release && mv /etc/temp /etc/armbian-release
+		chmod +x /etc/armbian-release		
 	fi
 
 	echo "Shut-off ntp to enable manual time-sync"

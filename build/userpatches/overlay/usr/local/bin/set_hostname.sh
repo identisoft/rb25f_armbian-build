@@ -3,12 +3,17 @@
 
 HOSTNAME_FULL=$(</etc/hostname)
 HOSTNAME=$(/usr/bin/head -n 1 /etc/hostname)
+MAC_PREFIX=$(/usr/local/bin/get_mac | awk '{print substr($1,0,9)}')
 if [ "$HOSTNAME_FULL" != "$HOSTNAME" ]; then
   echo "$HOSTNAME" > /etc/hostname
 fi
 
 if [ -z "$HOSTNAME" ] || [ "$HOSTNAME" == "127.0.0" ] || [ "$HOSTNAME" == "RB25F-" ]; then
-  HOSTNAME="RB25F"
+	if [ $MAC_PREFIX == "00:1A:6E" ]; then #Impro mac addr
+		HOSTNAME="HRB910"
+	else
+	  HOSTNAME="RB25F"
+	fi
 fi
 IP="$(/usr/local/bin/get_ipv4)"
 MAC="$(/usr/local/bin/get_mac)"
@@ -19,7 +24,11 @@ FA="$(/usr/local/bin/get_fixed_address)"
 BCAST="$(/usr/local/bin/get_ipv4_broadcast)"
 CURR_DATE=$(date)
 
-HOSTNAME_NEW="RB25F-"$MAC""
+if [ "$MAC_PREFIX" == "00:1A:6E" ]; then #Impro mac addr
+	HOSTNAME_NEW="HRB910-"$MAC""
+else
+	HOSTNAME_NEW="RB25F-"$MAC""
+fi
 
 if [ ! "$HOSTNAME" == "$HOSTNAME_NEW" ]; then
   HOSTNAME_START=$(echo "$HOSTNAME" | cut -c 1-5)

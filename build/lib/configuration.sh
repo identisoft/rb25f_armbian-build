@@ -8,7 +8,7 @@
 # https://github.com/armbian/build/
 
 # common options
-REVISION="5.56$SUBREVISION" # all boards have same revision
+REVISION="5.57$SUBREVISION" # all boards have same revision
 ROOTPWD="masterkey"
 MAINTAINER="Impro Technologies" # deb signature
 MAINTAINERMAIL="www.impro.net" # deb signature
@@ -71,7 +71,7 @@ PACKAGE_LIST="bc bridge-utils build-essential cpufrequtils device-tree-compiler 
 	ca-certificates resolvconf expect iptables automake \
 	bison flex libwrap0-dev libssl-dev libnl-3-dev libnl-genl-3-dev \
 	gdbserver libjson-c3 libmosquitto1 libmosquittopp1 libuuid1 \
-	mosquitto-clients ntpdate strace libusb-1.0-0-dev beep memtool"
+	mosquitto-clients ntpdate strace libusb-1.0-0-dev beep memtool socat"
 
 # Non-essential packages
 PACKAGE_LIST_ADDITIONAL="armbian-firmware alsa-utils iotop iozone3 stress sysbench screen \
@@ -79,7 +79,10 @@ PACKAGE_LIST_ADDITIONAL="armbian-firmware alsa-utils iotop iozone3 stress sysben
 	libproc-processtable-perl aptitude dnsutils f3 haveged vlan sysstat bash-completion \
 	hostapd git ethtool unzip ifenslave command-not-found libpam-systemd iperf3 \
 	software-properties-common libnss-myhostname f2fs-tools avahi-autoipd iputils-arping qrencode libpcap0.8 tcpdump \
-	libnss-resolve libpython2.7 sqlite3"
+	libnss-resolve libpython2.7 sqlite3 libwbclient0 samba-libs python-samba samba-common samba-common-bin \
+	winbind libnss-winbind libpam-winbind libcups2 gpgv gnupg2
+	libavahi-client3 libtalloc2 libtdb1 libtevent0 libldb1 python-crypto python-ldb python-tdb \
+	python-talloc libnss-mdns base-files"
 
 PACKAGE_LIST_RELEASE="man-db less kbd net-tools netcat-openbsd gnupg2 dirmngr"
 
@@ -90,6 +93,10 @@ DEBIAN_MIRROR='debian.mirror.ac.za/debian'
 APT_MIRROR=$DEBIAN_MIRROR
 
 [[ -n $APT_PROXY_ADDR ]] && display_alert "Using custom apt-cacher-ng address" "$APT_PROXY_ADDR" "info"
+
+# Base system dependencies
+DEBOOTSTRAP_LIST="locales,gnupg,ifupdown,apt-transport-https,ca-certificates"
+DEBOOTSTRAP_COMPONENTS="main"
 
 # Build final package list after possible override
 PACKAGE_LIST="$PACKAGE_LIST $PACKAGE_LIST_RELEASE $PACKAGE_LIST_ADDITIONAL"

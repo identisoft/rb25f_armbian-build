@@ -102,15 +102,15 @@ start=`date +%s`
 if [[ $IGNORE_UPDATES != yes ]]; then
 	display_alert "Downloading sources" "" "info"
 	if [[ $Build_Type == "release" ]]; then
-		fetch_from_repo "$BOOTSOURCE" "$BOOTDIR" "$BOOTBRANCH" "yes" "yes"
-		fetch_from_repo "$KERNELSOURCE" "$KERNELDIR" "$KERNELBRANCH" "yes" "yes"
-		fetch_from_repo "$ATFSOURCE" "$ATFDIR" "$ATFBRANCH" "yes" "yes"
-		fetch_from_repo "http://github.com/identisoft/rb25f_sunxi-tools" "sunxi-tools" "tag:$product_issue" "yes" "yes"
+		fetch_from_repo "$BOOTSOURCE" "$BOOTDIR" "$BOOTBRANCH" "no" "yes"
+		fetch_from_repo "$KERNELSOURCE" "$KERNELDIR" "$KERNELBRANCH" "no" "yes"
+		fetch_from_repo "$ATFSOURCE" "$ATFDIR" "$ATFBRANCH" "no" "yes"
+		fetch_from_repo "http://github.com/identisoft/rb25f_sunxi-tools" "sunxi-tools" "tag:$product_issue" "no" "yes"
 	else
-		fetch_from_repo "$BOOTSOURCE" "$BOOTDIR" "$BOOTBRANCH" "yes" "no"
-		fetch_from_repo "$KERNELSOURCE" "$KERNELDIR" "$KERNELBRANCH" "yes" "no"
-		fetch_from_repo "$ATFSOURCE" "$ATFDIR" "$ATFBRANCH" "yes" "no"
-		fetch_from_repo "http://github.com/identisoft/rb25f_sunxi-tools" "sunxi-tools" "branch:master" "yes" "no"
+		fetch_from_repo "$BOOTSOURCE" "$BOOTDIR" "$BOOTBRANCH" "no" "no"
+		fetch_from_repo "$KERNELSOURCE" "$KERNELDIR" "$KERNELBRANCH" "no" "no"
+		fetch_from_repo "$ATFSOURCE" "$ATFDIR" "$ATFBRANCH" "no" "no"
+		fetch_from_repo "http://github.com/identisoft/rb25f_sunxi-tools" "sunxi-tools" "branch:master" "no" "no"
 	fi
 fi
 
@@ -119,9 +119,9 @@ IMAGE_TYPE=HID
 
 compile_sunxi_tools
 
-BOOTSOURCEDIR=$BOOTDIR/${BOOTBRANCH##*:}
-LINUXSOURCEDIR=$KERNELDIR/${KERNELBRANCH##*:}
-[[ -n $ATFSOURCE ]] && ATFSOURCEDIR=$ATFDIR/${ATFBRANCH##*:}
+BOOTSOURCEDIR=$BOOTDIR
+LINUXSOURCEDIR=$KERNELDIR
+[[ -n $ATFSOURCE ]] && ATFSOURCEDIR=$ATFDIR
 
 # define package names
 DEB_BRANCH=${BRANCH//default}

@@ -159,10 +159,12 @@ fetch_from_repo()
 	local ref_subdir=$4
 	local make_tag=$5
 
-	if [[ -z $GithubUser ]] || [[ -z $GithubPass ]]; then
+	#if [[ -z $GithubUser ]] || [[ -z $GithubPass ]]; then
+	if [[ -z $GithubToken ]]; then
 		make_tag="no"
 	else
-		url=$(sed 's/\bhttp:\/\/\b/&'$GithubUser':'$GithubPass'@/' <<< $url)
+		#url=$(sed 's/\bhttp:\/\/\b/&'$GithubUser':'$GithubPass'@/' <<< $url)
+		url=$(sed 's/\bhttp:\/\/\b/&'$GithubToken'@/' <<< $url)
 	fi
 	
 	[[ -z $ref || ( $ref != tag:* && $ref != branch:* && $ref != head ) ]] && exit_with_error "Error in configuration"
@@ -750,6 +752,10 @@ fetch_gitlab_repo()
 	local ref_subdir=$5
 	local make_tag=$6
 
+	if [[ $Ignore_Git_Cert == "yes" ]]; then
+		git config --local http.sslVerify false
+	fi
+
 	if [[ -z $GitTokenName ]] || [[ -z GitTokenPass ]]; then
 		make_tag="no"
 	fi
@@ -891,7 +897,6 @@ fetch_gitlab_repo()
 
 get_product_issue()
 {
-  product_issue="1.5.0.80"
+  product_issue="1.5.0.82"
 }
-
 
