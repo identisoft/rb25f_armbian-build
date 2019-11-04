@@ -1,0 +1,17 @@
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-a64-eureka.dts b/arch/arm64/boot/dts/allwinner/sun50i-a64-eureka.dts
+index 895983c1c..4870a79e1 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-a64-eureka.dts
++++ b/arch/arm64/boot/dts/allwinner/sun50i-a64-eureka.dts
+@@ -1347,6 +1347,12 @@
+ 			gpios = <&pio 6 13 0>;
+ 			default-state = "off";
+ 		};		
++
++		Weigand_Tapper {
++			label = "Wiegand_Tamper";
++			gpios = <&pio 7 1 0>;
++			default-state = "off";
++		};
+ 		
+ 		unused_gpio_01 {
+ 			label = "unused_gpio_1";

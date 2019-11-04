@@ -42,9 +42,9 @@ if ! /usr/bin/test -f /root/.first_ran; then
 	  tune2fs -c 1 /dev/mmcblk0p1
 	fi
 	if /usr/bin/test $MAC_PREFIX == '00:1A:6E'; then
-		sed 's/HID iClass SE RB25F/Impro HRB910/' /etc/update-motd.d/10-armbian-header > /etc/update-motd.d/temp && rm /etc/update-motd.d/10-armbian-header && mv /etc/update-motd.d/temp /etc/update-motd.d/10-armbian-header
+		sed 's/HID iClass SE RB25F/Impro IBR/' /etc/update-motd.d/10-armbian-header > /etc/update-motd.d/temp && rm /etc/update-motd.d/10-armbian-header && mv /etc/update-motd.d/temp /etc/update-motd.d/10-armbian-header
 		sed 's/HID iClass SE/Impro/' /etc/update-motd.d/10-armbian-header > /etc/update-motd.d/temp && rm /etc/update-motd.d/10-armbian-header && mv /etc/update-motd.d/temp /etc/update-motd.d/10-armbian-header
-		sed 's/RB25F/HRB910/' /etc/update-motd.d/10-armbian-header > /etc/update-motd.d/temp && rm /etc/update-motd.d/10-armbian-header && mv /etc/update-motd.d/temp /etc/update-motd.d/10-armbian-header
+		sed 's/RB25F/IBR/' /etc/update-motd.d/10-armbian-header > /etc/update-motd.d/temp && rm /etc/update-motd.d/10-armbian-header && mv /etc/update-motd.d/temp /etc/update-motd.d/10-armbian-header
 		chmod +x /etc/update-motd.d/10-armbian-header 
 		
 		sed 's/IMAGE_TYPE=HID/IMAGE_TYPE=Impro/' /etc/armbian-release > /etc/temp && rm /etc/armbian-release && mv /etc/temp /etc/armbian-release
@@ -93,6 +93,7 @@ systemctl stop mosquitto; sleep 1; systemctl start mosquitto
 /usr/local/bin/set_hostname.sh
 
 mkdir /dev/output
-ln -s /sys/class/leds/relay/brightness /dev/output/relay 
+ln -s /sys/class/leds/relay/brightness /dev/output/relay
+ln -s /sys/class/leds/Wiegand_Tamper/brightness /dev/output/wiegand_tamper
 
 exit 0

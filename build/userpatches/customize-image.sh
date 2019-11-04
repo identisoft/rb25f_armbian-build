@@ -24,6 +24,7 @@ RELEASE=$1
 LINUXFAMILY=$2
 BOARD=$3
 Kernel_Version=$4
+REVISION=$5
 
 
 Main() {
@@ -48,6 +49,8 @@ Main() {
 	touch /etc/resolv.conf
 	touch /etc/resolvconf/resolv.conf.d/head
 	cd /
+	
+	echo "${REVISION}" > /etc/fs_version
 } # Main
 
 Main "$@"

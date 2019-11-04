@@ -8,7 +8,7 @@
 # https://github.com/armbian/build/
 
 # common options
-REVISION="5.57$SUBREVISION" # all boards have same revision
+REVISION="5.58$SUBREVISION" # all boards have same revision
 ROOTPWD="masterkey"
 MAINTAINER="Impro Technologies" # deb signature
 MAINTAINERMAIL="www.impro.net" # deb signature
@@ -71,7 +71,7 @@ PACKAGE_LIST="bc bridge-utils build-essential cpufrequtils device-tree-compiler 
 	ca-certificates resolvconf expect iptables automake \
 	bison flex libwrap0-dev libssl-dev libnl-3-dev libnl-genl-3-dev \
 	gdbserver libjson-c3 libmosquitto1 libmosquittopp1 libuuid1 \
-	mosquitto-clients ntpdate strace libusb-1.0-0-dev beep memtool socat"
+	mosquitto-clients ntpdate strace libusb-1.0-0-dev beep memtool socat cryptmount"
 
 # Non-essential packages
 PACKAGE_LIST_ADDITIONAL="armbian-firmware alsa-utils iotop iozone3 stress sysbench screen \
@@ -82,7 +82,7 @@ PACKAGE_LIST_ADDITIONAL="armbian-firmware alsa-utils iotop iozone3 stress sysben
 	libnss-resolve libpython2.7 sqlite3 libwbclient0 samba-libs python-samba samba-common samba-common-bin \
 	winbind libnss-winbind libpam-winbind libcups2 gpgv gnupg2
 	libavahi-client3 libtalloc2 libtdb1 libtevent0 libldb1 python-crypto python-ldb python-tdb \
-	python-talloc libnss-mdns base-files"
+	python-talloc libnss-mdns base-files "
 
 PACKAGE_LIST_RELEASE="man-db less kbd net-tools netcat-openbsd gnupg2 dirmngr"
 

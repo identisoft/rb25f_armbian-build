@@ -18,50 +18,61 @@ echo -e "\nFactory defaulting...\n"
 # systemctl stop watchdog
 
 #-------------------------------------------------------------------------
+# Reset credentials and enable ssh in case it was switched off
+#-------------------------------------------------------------------------
+echo -e "masterkey\nmasterkey" | passwd -q &
+
+# Enable possibly disabled services
+systemctl enable ssh &
+systemctl enable serial-getty@ttyS0 &
+systemctl enable discovery &
+
+#-------------------------------------------------------------------------
 # Discovery Cleanup - Add Discovery cleanup here
 #-------------------------------------------------------------------------
 # systemctl stop discovery.service # This script stops running if triggered by discovery, and discovery exits
-rm -vf /etc/discoveryd.conf  # Delete the conf file and the app will recreate the default file
+rm -f /etc/discoveryd.conf  # Delete the conf file and the app will recreate the default file
 
 #-------------------------------------------------------------------------
 # IPLWall Cleanup - Add IPLWall cleanup here
 #-------------------------------------------------------------------------
-systemctl stop iplwall.service
-rm -vf /usr/local/eureka/iplwall/cVars
-rm -vf /usr/local/eureka/iplwall/upa
-rm -vf /usr/local/eureka/iplwall/tables.db
+#systemctl stop iplwall.service
+rm -f /usr/local/eureka/iplwall/cVars
+rm -f /usr/local/eureka/iplwall/upa
+rm -f /usr/local/eureka/iplwall/tables.db
 
 #-------------------------------------------------------------------------
 # Lumidigm Cleanup - Add Lumidigm cleanup here
 #-------------------------------------------------------------------------
-rm -rvf /usr/local/HID_Global/Lumidigm/var/lib/IDDB
+rm -rf /usr/local/HID_Global/Lumidigm/var/lib/IDDB
 
 #-------------------------------------------------------------------------
 # hbserver Cleanup - Add hbserver cleanup here
 #-------------------------------------------------------------------------
-rm -vf /usr/local/eureka/hbserver/UsersConfig.json
-rm -vf /usr/local/eureka/hbserver/primary.sqlite
+rm -f /usr/local/eureka/hbserver/UsersConfig.json
+rm -f /usr/local/eureka/hbserver/primary.sqlite
+rm -f /usr/local/eureka/hbserver/certificates/*.pem
 
 #-------------------------------------------------------------------------
 # System Cleanup
 #-------------------------------------------------------------------------
-rm -vf /var/log/apt/*
-rm -vf /var/log/mosquitto/*
-rm -vf /var/log/ntpstats/*
-rm -vf /var/log/sysstat/*
-rm -vf /var/log/unattended-upgrades/*
+rm -f /var/log/apt/*
+rm -f /var/log/mosquitto/*
+rm -f /var/log/ntpstats/*
+rm -f /var/log/sysstat/*
+rm -f /var/log/unattended-upgrades/*
 find /var/log -maxdepth 1 -type f -delete  # Should not do this unless the platform is rebooted
 
-rm -vf /var/log.hdd/apt/*
-rm -vf /var/log.hdd/mosquitto/*
-rm -vf /var/log.hdd/ntpstats/*
-rm -vf /var/log.hdd/sysstat/*
-rm -vf /var/log.hdd/unattended-upgrades/*
+rm -f /var/log.hdd/apt/*
+rm -f /var/log.hdd/mosquitto/*
+rm -f /var/log.hdd/ntpstats/*
+rm -f /var/log.hdd/sysstat/*
+rm -f /var/log.hdd/unattended-upgrades/*
 find /var/log.hdd -maxdepth 1 -type f -delete  # Should not do this unless the platform is rebooted
 
-rm -rvf .Trash-0
-rm -rvf /lost+found/*
-rm -rvf /var/tmp/*
+rm -rf .Trash-0
+rm -rf /lost+found/*
+rm -rf /var/tmp/*
 #-------------------------------------------------------------------------
 
 #-------------------------------------------------------------------------
@@ -76,17 +87,14 @@ rm -f /var/lib/dhcp/*
 #rm -f /var/lib/NetworkManager/*
 #-------------------------------------------------------------------------
 
-#-------------------------------------------------------------------------
-# Reset credentials and enable ssh in case it was switched off
-#-------------------------------------------------------------------------
-echo -e "masterkey\nmasterkey" | passwd -q
-systemctl enable ssh
+
+
 #-------------------------------------------------------------------------
 
 #-------------------------------------------------------------------------
 # Filesystem
 #-------------------------------------------------------------------------
-/sbin/fstrim -v /
+/sbin/fstrim /
 /bin/sync
 #-------------------------------------------------------------------------
 
@@ -94,7 +102,7 @@ systemctl enable ssh
 # Finish Off
 #-------------------------------------------------------------------------
 cat /dev/null > ~/.bash_history && history -c
-sleep 5
+#sleep 5
 reboot &
 exit 0
 #-------------------------------------------------------------------------

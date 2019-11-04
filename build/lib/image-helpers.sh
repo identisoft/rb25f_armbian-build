@@ -105,7 +105,7 @@ customize_image()
 	# util-linux >= 2.27 required
 	mount -o bind,wo $SRC/userpatches/overlay $SDCARD/tmp/overlay
 	display_alert "Calling image customization script" "customize-image.sh" "info"
-	chroot $SDCARD /bin/bash -c "/tmp/customize-image.sh $RELEASE $LINUXFAMILY $BOARD $KERNELVERSION" 
+	chroot $SDCARD /bin/bash -c "/tmp/customize-image.sh $RELEASE $LINUXFAMILY $BOARD $KERNELVERSION $REVISION" 
 	umount $SDCARD/tmp/overlay
 	mountpoint -q $SDCARD/tmp/overlay || rm -r $SDCARD/tmp/overlay
 } #############################################################################
