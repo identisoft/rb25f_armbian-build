@@ -6,14 +6,22 @@ BOOTDELAY=1
 # since this doesn't affect any stable images don't add any backwards compatibility hacks
 LINUXFAMILY=eureka
 
+SPLSOURCE='https://github.com/apritzel/u-boot.git'
+SPLSOURCEDIR='u-boot-spl'
+SPLBRANCH="branch:sunxi64-fel32"
+SPLPATCHDIR='spl-rb25f'
+SPL_COMPILER="arm-linux-gnueabihf-"
+SPL_USE_GCC='> 7.0'
 
-ATFSOURCE='http://github.com/identisoft/rb25f_arm-trusted-firmware-sunxi.git'
+#ATFSOURCE='http://github.com/identisoft/rb25f_arm-trusted-firmware.git'
+ATFSOURCE='http://github.com/apritzel/arm-trusted-firmware.git'
 ATFDIR='arm-trusted-firmware-sunxi'
-if [[ $Build_Type == "release" ]]; then
-	ATFBRANCH="tag:$product_issue"
-else
-	ATFBRANCH="branch:master"
-fi
+#if [[ $Build_Type == "release" ]]; then
+#	ATFBRANCH="tag:$product_issue"
+#else
+#	ATFBRANCH="branch:master"
+#fi
+ATFBRANCH="branch:allwinner"
 ATF_PATCH_DIR='atf-rb25f'
 ATF_USE_GCC='> 6.3'
 ATF_TARGET_MAP='PLAT=sun50iw1p1 DEBUG=1 bl31;;build/sun50iw1p1/debug/bl31.bin'

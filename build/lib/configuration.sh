@@ -74,7 +74,7 @@ PACKAGE_LIST="bc bridge-utils build-essential cpufrequtils device-tree-compiler 
 	mosquitto-clients ntpdate strace libusb-1.0-0-dev beep memtool socat cryptmount"
 
 # Non-essential packages
-PACKAGE_LIST_ADDITIONAL="armbian-firmware alsa-utils iotop iozone3 stress sysbench screen \
+PACKAGE_LIST_ADDITIONAL="alsa-utils iotop iozone3 stress sysbench screen \
 	vim pciutils evtest htop pv lsof apt-transport-https libfuse2 libdigest-sha-perl \
 	libproc-processtable-perl aptitude dnsutils f3 haveged vlan sysstat bash-completion \
 	hostapd git ethtool unzip ifenslave command-not-found libpam-systemd iperf3 \

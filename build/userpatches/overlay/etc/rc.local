@@ -51,12 +51,12 @@ if ! /usr/bin/test -f /root/.first_ran; then
 		chmod +x /etc/armbian-release		
 	fi
 
-	echo "Shut-off ntp to enable manual time-sync"
-	/bin/sleep 10
-	/bin/systemctl disable ntp
-	/bin/systemctl stop ntp
-	/usr/sbin/ntpdate -b pool.ntp.org
-	hwclock -w
+#	echo "Shut-off ntp to enable manual time-sync"
+#	/bin/sleep 10
+#	/bin/systemctl disable ntp
+#	/bin/systemctl stop ntp
+#	/usr/sbin/ntpdate -b pool.ntp.org
+#	hwclock -w
 	depmod
 	ldconfig
 	
@@ -70,6 +70,7 @@ if ! /usr/bin/test -f /root/.first_ran; then
 	sleep 2
 	cp /etc/mosquitto/mosquitto.orig /etc/mosquitto/mosquitto.conf
 	
+	systemctl mask serial-getty@ttyS0
 	/usr/bin/touch /root/.first_ran
 	sync
 	sleep 1

@@ -1,0 +1,82 @@
+diff --git a/configs/eureka_defconfig b/configs/eureka_defconfig
+index 6b25143..1731720 100644
+--- a/configs/eureka_defconfig
++++ b/configs/eureka_defconfig
+@@ -24,5 +24,16 @@ CONFIG_SUN8I_EMAC=y
+ CONFIG_USB_EHCI_HCD=y
+ CONFIG_SYS_USB_EVENT_POLL_VIA_INT_QUEUE=y
+ CONFIG_DM_GPIO=y
+-CONFIG_AUTOBOOT_STOP_STR="e.01pp"
++#CONFIG_AUTOBOOT_STOP_STR="e.01pp"
+ 
++CONFIG_CMD_CONFIG=y
++CONFIG_CMD_CRC32_VERIFY=y
++CONFIG_CMD_MD5SUM=y
++CONFIG_CMD_MEMINFO=y
++#CONFIG_CMD_MEMTEST=y
++CONFIG_CMD_STRINGS=y
++#CONFIG_CMD_ZIP=y
++CONFIG_CMD_SDRAM=y
++
++#CONFIG_CMD_BOOTD=n
++#CONFIG_CMD_BOOTM=n
+diff --git a/include/configs/sun50i.h b/include/configs/sun50i.h
+index 272ac32..f292323 100644
+--- a/include/configs/sun50i.h
++++ b/include/configs/sun50i.h
+@@ -3,31 +3,26 @@
+  *
+  * SPDX-License-Identifier:	GPL-2.0+
+  */
++#define FEL_BOOT
+ 
+ #ifndef __CONFIG_H
+ #define __CONFIG_H
+ 
+-/*#ifdef CONFIG_BOOTDELAY
+-	#undef CONFIG_BOOTDELAY
+-#endif
+-#define CONFIG_BOOTDELAY 1*/
++#define CONFIG_IP_DEFRAG
++#define CONFIG_TFTP_BLOCKSIZE 8192
++/*#define CONFIG_TFTP_BLOCKSIZE 16384*/
+ 
+ #ifdef CONFIG_ENV_OFFSET
+ 	#undef CONFIG_ENV_OFFSET
+ #endif
+ #define CONFIG_ENV_OFFSET		0xFF000
+-#define CONFIG_CMD_EXT4_WRITE
+-
+-/*
+- * A64 specific configuration
+- */
+ 
+ #ifdef CONFIG_USB_EHCI_HCD
+ #define CONFIG_USB_EHCI_SUNXI
+ #define CONFIG_USB_MAX_CONTROLLER_COUNT 1
+ #endif
+ 
+-#define CONFIG_SUNXI_USB_PHYS	1
++#define CONFIG_SUNXI_USB_PHYS 1
+ 
+ #define GICD_BASE		0x1c81000
+ #define GICC_BASE		0x1c82000
+@@ -37,4 +32,18 @@
+  */
+ #include <configs/sunxi-common.h>
+ 
++#ifdef FEL_BOOT
++/* Additional Stuff (For Spl Booting) */
++#define CONFIG_ENV_OVERWRITE
++#undef CONFIG_BOOTDELAY
++#define CONFIG_BOOTDELAY 1
++#undef CONFIG_BOOTARGS
++
++#undef CONFIG_EXTRA_ENV_SETTINGS
++#define CONFIG_EXTRA_ENV_SETTINGS \
++  "autoload=n\0" \
++  "distro_bootcmd=source 0xb0000000\0"
++
++#endif /* FEL_BOOT */
++
+ #endif /* __CONFIG_H */

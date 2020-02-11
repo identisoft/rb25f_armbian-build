@@ -206,7 +206,7 @@ fetch_from_repo()
 	
 	local changed=false
 
-	if [[ $Build_Type == "release" ]]; then
+	if [[ $Build_Type == "release" && $make_tag == "yes" ]]; then
 		tag_exist=$(git ls-remote $url | grep "${ref_type}" | grep "${ref_name}" | awk '{print $2}')
 		if [[ $tag_exist == "refs/${ref_type}s/${ref_name}" ]]; then
 			create_tag="no"
@@ -897,6 +897,6 @@ fetch_gitlab_repo()
 
 get_product_issue()
 {
-  product_issue="1.5.0.84"
+  product_issue="1.5.0.86"
 }
 

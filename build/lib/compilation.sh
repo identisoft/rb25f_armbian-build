@@ -69,10 +69,126 @@ compile_atf()
 		fi
 		[[ ! -f $f_src ]] && exit_with_error "ATF file not found" "$(basename $f_src)"
 		cp $f_src $atftempdir/$f_dst
+		mkdir -p $DEST/images/felboot/bin
+		#cp $sftdir/build/cache/sources/$ATFSOURCEDIR/sun50iw1p1/debug/bl31.bin $DEST/images/felboot/bin
+		cp $SRC/cache/sources/$ATFSOURCEDIR/build/sun50iw1p1/debug/bl31.bin $DEST/images/felboot/bin
 	done
 
 	# copy license file to pack it to u-boot package later
 	[[ -f license.md ]] && cp license.md $atftempdir/
+}
+
+compile_spl()
+{
+	if [[ ! -f $SRC/cache/sources/$ATFSOURCEDIR/build/sun50iw1p1/debug/bl31.bin ]]; then
+		display_alert "Forcing ATF build" "" "info"
+		compile_atf
+	fi
+	if [[ $CLEAN_LEVEL == *make* ]]; then
+		display_alert "Cleaning" "$SPLSOURCEDIR" "info"
+		(cd $SRC/cache/sources/$SPLSOURCEDIR; make clean > /dev/null 2>&1)
+	fi
+	
+	local spldir="$SRC/cache/sources/$SPLSOURCEDIR"
+	cd "$spldir"
+	cp $SRC/cache/sources/$ATFSOURCEDIR/build/sun50iw1p1/debug/bl31.bin .
+	
+	display_alert "Compile SPL" "" "info"
+	
+	local toolchain=$(find_toolchain "$SPL_COMPILER" "$SPL_UCE_GCC")
+	[[ -z $toolchain ]] && exit_with_error "Could not find required toolchain" "${SPL_COMPILER}gcc $SPL_USE_GCC"
+	
+	display_alert "Compiler version" "${SPL_COMPILER}gcc $(eval env PATH=$toolchain:$PATH ${SPL_COMPILER}gcc -dumpversion)" "info"
+	
+	display_alert "Checking out sources"
+	git checkout -f -q HEAD
+
+	if [[ $CLEAN_LEVEL == *make* ]]; then
+		display_alert "Cleaning" "$SPLSOURCEDIR" "info"
+		(cd $SRC/cache/sources/$SPLSOURCEDIR; make clean > /dev/null 2>&1)
+	fi
+
+	advanced_patch "spl" "$SPLPATCHDIR" "$BOARD" "$target_patchdir" "$BRANCH" "${LINUXFAMILY}-${BOARD}-${BRANCH}"
+
+	# create patch for manual source changes
+	[[ $PATCH_SPL == yes ]] && userpatch_create "spl"
+
+	eval CCACHE_BASEDIR="$(pwd)" env PATH=$toolchain:$PATH \
+		'make $CTHREADS sun50i-a64-lpddr3-spl_defconfig CROSS_COMPILE="$CCACHE $SPL_COMPILER"' 2>&1 \
+		${PROGRESS_LOG_TO_FILE:+' | tee -a $DEST/debug/compilation.log'} \
+		${OUTPUT_VERYSILENT:+' >/dev/null 2>/dev/null'}
+
+	eval CCACHE_BASEDIR="$(pwd)" env PATH=$toolchain:$PATH \
+		'make $CTHREADS CROSS_COMPILE="$CCACHE $SPL_COMPILER"' 2>&1 \
+		${PROGRESS_LOG_TO_FILE:+' | tee -a $DEST/debug/compilation.log'} \
+		${OUTPUT_DIALOG:+' | dialog --backtitle "$backtitle" --progressbox "Compiling u-boot..." $TTY_Y $TTY_X'} \
+		${OUTPUT_VERYSILENT:+' >/dev/null 2>/dev/null'}
+
+	[[ ${PIPESTATUS[0]} -ne 0 ]] && exit_with_error "SPL compilation failed"
+
+	mkdir -p $DEST/images/felboot/bin 
+	cp $spldir/spl/sunxi-spl.bin $DEST/images/felboot/bin
+}
+
+compile_fel_uboot()
+{
+	if [[ ! -f $SRC/cache/sources/$ATFSOURCEDIR/build/sun50iw1p1/debug/bl31.bin ]]; then
+		display_alert "Forcing ATF build" "" "info"
+		compile_atf
+	fi
+	# not optimal, but extra cleaning before overlayfs_wrapper should keep sources directory clean
+	if [[ $CLEAN_LEVEL == *make* ]]; then
+		display_alert "Cleaning" "$BOOTSOURCEDIR" "info"
+		(cd $SRC/cache/sources/$BOOTSOURCEDIR; make clean > /dev/null 2>&1)
+	fi
+
+	local ubootdir="$SRC/cache/sources/$BOOTSOURCEDIR"
+	cd "$ubootdir"
+	cp $SRC/cache/sources/$ATFSOURCEDIR/build/sun50iw1p1/debug/bl31.bin .
+	
+	local version=$(grab_version "$ubootdir")
+	local sublevel=$(cat "$SRC/cache/sources/$BOOTSOURCEDIR/Makefile" | grep "SUBLEVEL =" | awk '{print $3}')
+	local version=${version}.${sublevel}
+
+	display_alert "Compiling u-boot for Fel-Booting" "$version" "info"
+
+	local toolchain=$(find_toolchain "$UBOOT_COMPILER" "$UBOOT_USE_GCC")
+	[[ -z $toolchain ]] && exit_with_error "Could not find required toolchain" "${UBOOT_COMPILER}gcc $UBOOT_USE_GCC"
+
+	display_alert "Compiler version" "${UBOOT_COMPILER}gcc $(eval env PATH=$toolchain:$PATH ${UBOOT_COMPILER}gcc -dumpversion)" "info"
+	
+	display_alert "Checking out sources"
+	git checkout -f -q HEAD
+
+	if [[ $CLEAN_LEVEL == *make* ]]; then
+		display_alert "Cleaning" "$BOOTSOURCEDIR" "info"
+		(cd $SRC/cache/sources/$BOOTSOURCEDIR; make clean > /dev/null 2>&1)
+	fi
+
+	advanced_patch "u-boot-fel" "$FELBOOTPATCHDIR" "$BOARD" "$target_patchdir" "$BRANCH" "${LINUXFAMILY}-${BOARD}-${BRANCH}"
+
+	# create patch for manual source changes
+	[[ $PATCH_FEL_UBOOT == yes ]] && userpatch_create "fel-u-boot"
+	
+	eval CCACHE_BASEDIR="$(pwd)" env PATH=$toolchain:$PATH \
+		'make $CTHREADS eureka_defconfig CROSS_COMPILE="$CCACHE $UBOOT_COMPILER"' 2>&1 \
+		${PROGRESS_LOG_TO_FILE:+' | tee -a $DEST/debug/compilation.log'} \
+		${OUTPUT_VERYSILENT:+' >/dev/null 2>/dev/null'}
+
+	eval CCACHE_BASEDIR="$(pwd)" env PATH=$toolchain:$PATH \
+		'make $CTHREADS CROSS_COMPILE="$CCACHE $UBOOT_COMPILER"' 2>&1 \
+		${PROGRESS_LOG_TO_FILE:+' | tee -a $DEST/debug/compilation.log'} \
+		${OUTPUT_DIALOG:+' | dialog --backtitle "$backtitle" --progressbox "Compiling u-boot..." $TTY_Y $TTY_X'} \
+		${OUTPUT_VERYSILENT:+' >/dev/null 2>/dev/null'}
+
+	[[ ${PIPESTATUS[0]} -ne 0 ]] && exit_with_error "SPL compilation failed"
+
+	display_alert "Building boot script" "" "info"
+	cp $SRC/config/fel/tftp-write.sh $ubootdir
+	mkimage -T script -C none -n 'tftp script' -d tftp-write.sh tftp-write.img
+	mkdir -p $DEST/images/felboot/bin 
+	cp $ubootdir/u-boot.bin $DEST/images/felboot/bin
+	cp $ubootdir/tftp-write.img $DEST/images/felboot/bin
 }
 
 compile_uboot()
@@ -493,7 +609,7 @@ userpatch_create()
 	display_alert "Make your changes in this directory:" "$(pwd)" "wrn"
 	
 	display_alert "Press <Enter> after you are done" "waiting" "wrn"
-	[[ $PATCH_ATF == yes || $PATCH_UBOOT == yes || $PATCH_KERNEL == yes ]] && read </dev/tty
+	[[ $PATCH_ATF == yes || $PATCH_UBOOT == yes || $PATCH_KERNEL == yes || $PATCH_SPL == yes || $PATCH_FEL_UBOOT == yes ]] && read </dev/tty
 	tput cuu1
 	git add .
 	# create patch out of changes

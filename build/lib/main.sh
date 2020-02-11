@@ -102,11 +102,13 @@ start=`date +%s`
 if [[ $IGNORE_UPDATES != yes ]]; then
 	display_alert "Downloading sources" "" "info"
 	if [[ $Build_Type == "release" ]]; then
+		fetch_from_repo "$SPLSOURCE" "SPLSOURCEDIR" "$SPLBRANCH" "no" "no"
 		fetch_from_repo "$BOOTSOURCE" "$BOOTDIR" "$BOOTBRANCH" "no" "yes"
 		fetch_from_repo "$KERNELSOURCE" "$KERNELDIR" "$KERNELBRANCH" "no" "yes"
 		fetch_from_repo "$ATFSOURCE" "$ATFDIR" "$ATFBRANCH" "no" "yes"
 		fetch_from_repo "http://github.com/identisoft/rb25f_sunxi-tools" "sunxi-tools" "tag:$product_issue" "no" "yes"
 	else
+		fetch_from_repo "$SPLSOURCE" "$SPLSOURCEDIR" "$SPLBRANCH" "no" "no"
 		fetch_from_repo "$BOOTSOURCE" "$BOOTDIR" "$BOOTBRANCH" "no" "no"
 		fetch_from_repo "$KERNELSOURCE" "$KERNELDIR" "$KERNELBRANCH" "no" "no"
 		fetch_from_repo "$ATFSOURCE" "$ATFDIR" "$ATFBRANCH" "no" "no"
@@ -137,11 +139,30 @@ for option in $(tr ',' ' ' <<< "$CLEAN_LEVEL"); do
 done
 
 # Compile u-boot if packed .deb does not exist
+if [[ ! -f $DEST/images/felboot/bin/bl31.bin ]] || [[ ${FORCE_ATF_REBUILD} == "yes" ]]; then
+	if [[ ${SKIP_ATF_BUILD} != yes ]]; then
+  		compile_atf
+  	fi
+fi
+
 if [[ ! -f $DEST/debs/${CHOSEN_UBOOT}_${REVISION}_${ARCH}.deb ]] || [[ $Force_Uboot_Rebuild == "yes" ]]; then
 	if [[ -n $ATFSOURCE ]]; then
 		compile_atf
 	fi
 	compile_uboot
+fi
+
+# Compile SPL and u-boot for fel booting
+if [[ ! -f $DEST/images/felboot/bin/sunxi-spl.bin ]] || [[ ${FORCE_SPL_REBUILD} == "yes" ]]; then
+#	if [[ ${SKIP_SPL_BUILD} != yes ]]; then 
+		compile_spl
+#	fi
+fi
+
+if [[ ! -f $DEST/images/felboot/bin/u-boot.bin ]] || [[ ${FORCE_FEL_UBOOT_REBUILD} == "yes" ]]; then 
+#	if [[ ${SKIP_FEL_UBOOT_BUILD} != yes ]]; then
+		compile_fel_uboot
+#	fi
 fi
 
 # Compile kernel if packed .deb does not exist
