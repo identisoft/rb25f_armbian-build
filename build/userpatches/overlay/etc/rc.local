@@ -70,7 +70,6 @@ if ! /usr/bin/test -f /root/.first_ran; then
 	sleep 2
 	cp /etc/mosquitto/mosquitto.orig /etc/mosquitto/mosquitto.conf
 	
-	systemctl mask serial-getty@ttyS0
 	/usr/bin/touch /root/.first_ran
 	sync
 	sleep 1
@@ -89,12 +88,15 @@ mkdir -p /var/log/mosquitto /var/log.hdd/mosquitto
 touch /var/log/mosquitto/mosquitto.log /var/log.hdd/mosquitto/mosquitto.log
 chown -R mosquitto:mosquitto /var/log/mosquitto /var/log.hdd/mosquitto
 systemctl stop mosquitto; sleep 1; systemctl start mosquitto
+systemctl mask serial-getty@ttyS0
 
 # Set the hostname to include the MAC Address
 /usr/local/bin/set_hostname.sh
+/usr/local/bin/get_wait4ipv4 &
 
 mkdir /dev/output
 ln -s /sys/class/leds/relay/brightness /dev/output/relay
 ln -s /sys/class/leds/Wiegand_Tamper/brightness /dev/output/wiegand_tamper
+
 
 exit 0

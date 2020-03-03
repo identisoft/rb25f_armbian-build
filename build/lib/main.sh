@@ -105,7 +105,7 @@ if [[ $IGNORE_UPDATES != yes ]]; then
 		fetch_from_repo "$SPLSOURCE" "SPLSOURCEDIR" "$SPLBRANCH" "no" "no"
 		fetch_from_repo "$BOOTSOURCE" "$BOOTDIR" "$BOOTBRANCH" "no" "yes"
 		fetch_from_repo "$KERNELSOURCE" "$KERNELDIR" "$KERNELBRANCH" "no" "yes"
-		fetch_from_repo "$ATFSOURCE" "$ATFDIR" "$ATFBRANCH" "no" "yes"
+		fetch_from_repo "$ATFSOURCE" "$ATFDIR" "$ATFBRANCH" "no" "no"
 		fetch_from_repo "http://github.com/identisoft/rb25f_sunxi-tools" "sunxi-tools" "tag:$product_issue" "no" "yes"
 	else
 		fetch_from_repo "$SPLSOURCE" "$SPLSOURCEDIR" "$SPLBRANCH" "no" "no"

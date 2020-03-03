@@ -1,0 +1,15 @@
+#!/bin/bash
+
+echo "Looking for IP Address..."
+IP=""
+while [ "$IP" == "" ] ; do
+    IP="$(/sbin/ip addr | grep eth0 | grep inet | awk '{print $2}')"
+    if [ "$IP" == "" ]
+    then
+        dhclient eth0; 
+    fi
+    sleep 3
+done
+
+echo "Local IP Address = $IP" > /dev/ttyS0
+exit 0

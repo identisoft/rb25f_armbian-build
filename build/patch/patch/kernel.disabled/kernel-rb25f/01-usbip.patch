@@ -1,0 +1,18 @@
+diff --git a/tools/usb/usbip/libsrc/vhci_driver.c b/tools/usb/usbip/libsrc/vhci_driver.c
+index d1fc0f9f0..a1fd92a75 100644
+--- a/tools/usb/usbip/libsrc/vhci_driver.c
++++ b/tools/usb/usbip/libsrc/vhci_driver.c
+@@ -150,7 +150,12 @@ static int get_nports(void)
+ 
+ static int vhci_hcd_filter(const struct dirent *dirent)
+ {
+-	return strcmp(dirent->d_name, "vhci_hcd") >= 0;
++	size_t l = strlen(dirent->d_name);
++	if (l < 8)
++		return 0;
++	if (memcmp(dirent->d_name, "vhci_hcd", 8))
++		return 0;
++	return 1;
+ }
+ 
+ static int get_ncontrollers(void)
